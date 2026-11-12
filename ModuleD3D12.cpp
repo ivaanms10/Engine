@@ -1,6 +1,17 @@
 #include "Globals.h"
 #include "ModuleD3D12.h"
 
+//Constructor
+ModuleD3D12::ModuleD3D12(HWND hWnd)
+{
+}
+
+//Destructor
+ModuleD3D12::~ModuleD3D12()
+{
+}
+
+
 bool ModuleD3D12::init()
 {
 	OutputDebugStringA("ModuleD3D12 init\n");
@@ -34,6 +45,7 @@ bool ModuleD3D12::init()
 
 	return true;
 }
+
 
 bool ModuleD3D12::cleanUp()
 {
