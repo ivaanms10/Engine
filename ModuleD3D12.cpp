@@ -107,3 +107,19 @@ void ModuleD3D12::createRTVs()
 		device->CreateRenderTargetView(backBuffers[i].Get(), nullptr, handle);
 	}
 }
+
+//Method to create the command objects.
+void ModuleD3D12::createCommandObjects()
+{
+	for (UINT i = 0; i < FRAME_COUNT; ++i){
+		device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocators[i]));
+	}
+	device->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&commandList));
+}
+
+//Method to create the fence.
+void ModuleD3D12::createFence()
+{
+	device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+}
