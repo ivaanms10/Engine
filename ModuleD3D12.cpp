@@ -2,7 +2,7 @@
 #include "ModuleD3D12.h"
 
 //Constructor
-ModuleD3D12::ModuleD3D12(HWND hWnd)
+ModuleD3D12::ModuleD3D12(HWND hWnd) : hWnd(hWnd)
 {
 }
 
@@ -43,6 +43,13 @@ bool ModuleD3D12::init()
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
 	#endif
 
+	//We call the methods to create the command queue, swap chain, RTVs, command objects and fence.
+	createCommandQueue();
+	createSwapChain();
+	createRTVs();
+	createCommandObjects();
+	createFence();
+
 	return true;
 }
 
@@ -50,4 +57,14 @@ bool ModuleD3D12::init()
 bool ModuleD3D12::cleanUp()
 {
 	return true;
+}
+
+//Method to create the command queue.
+void ModuleD3D12::createCommandQueue()
+{
+	D3D12_COMMAND_QUEUE_DESC desc = {};
+	desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+	desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+	desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+	device->CreateCommandQueue(&desc, IID_PPV_ARGS(&commandQueue));
 }
