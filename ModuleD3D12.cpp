@@ -123,3 +123,19 @@ void ModuleD3D12::createFence()
 	device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 }
+
+//Method to wait for a specific fence value.
+void ModuleD3D12::waitForFence(UINT64 value)
+{
+	if (fence->GetCompletedValue() < value){
+		fence->SetEventOnCompletion(value, fenceEvent);
+		WaitForSingleObject(fenceEvent, INFINITE);
+	}
+}
+
+//Method to wait for the GPU to finish its work.
+void ModuleD3D12::waitForGPU()
+{
+	commandQueue->Signal(fence.Get(), ++fenceValue);
+	waitForFence(fenceValue);
+}
