@@ -68,3 +68,25 @@ void ModuleD3D12::createCommandQueue()
 	desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	device->CreateCommandQueue(&desc, IID_PPV_ARGS(&commandQueue));
 }
+
+//Method to create the swap chain.
+void ModuleD3D12::createSwapChain()
+{
+	DXGI_SWAP_CHAIN_DESC1 desc = {};
+	desc.Width = 800;
+	desc.Height = 600;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.Stereo = FALSE;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	desc.BufferCount = FRAME_COUNT;
+	desc.Scaling = DXGI_SCALING_STRETCH;
+	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+	desc.Flags = 0;
+
+	ComPtr<IDXGISwapChain1> swapChain1;
+	factory->CreateSwapChainForHwnd(commandQueue.Get(), hWnd, &desc, nullptr, nullptr, &swapChain1);
+	swapChain1.As(&swapChain);
+}
