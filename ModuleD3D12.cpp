@@ -147,3 +147,34 @@ void ModuleD3D12::preRender()
 	waitForFence(fenceValues[currentIndex]);
 	allocators[currentIndex]->Reset();
 }
+
+//Method to record the commands for rendering.
+void ModuleD3D12::render()
+{
+	commandList->Reset(allocators[currentIndex].Get(), nullptr);
+
+	auto toRT = CD3DX12_RESOURCE_BARRIER::Transition(backBuffers[currentIndex].Get(),
+		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	commandList->ResourceBarrier(1, &toRT);
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(rtvHeap->GetCPUDescriptorHandleForHeapStart(), currentIndex, rtvSize);
+	float red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	commandList->ClearRenderTargetView(rtv, red, 0, nullptr);
+
+	auto toPresent = CD3DX12_RESOURCE_BARRIER::Transition(backBuffers[currentIndex].Get(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+	commandList->ResourceBarrier(1, &toPresent);
+
+	commandList->Close();
+	ID3D12CommandList* lists[] = { commandList.Get() };
+	commandQueue->ExecuteCommandLists(1, lists);
+
+	swapChain->Present(1, 0);
+}
+
+//Method to present the rendered frame and signal the fence.
+void ModuleD3D12::postRender()
+{
+	commandQueue->Signal(fence.Get(), ++fenceValue);
+	fenceValues[currentIndex] = fenceValue;
+}
