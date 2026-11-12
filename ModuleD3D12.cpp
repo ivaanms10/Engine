@@ -90,3 +90,20 @@ void ModuleD3D12::createSwapChain()
 	factory->CreateSwapChainForHwnd(commandQueue.Get(), hWnd, &desc, nullptr, nullptr, &swapChain1);
 	swapChain1.As(&swapChain);
 }
+
+//Method to create the RTVs.
+void ModuleD3D12::createRTVs()
+{
+	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+	desc.NumDescriptors = FRAME_COUNT;
+	desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&rtvHeap));
+	rtvSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	
+	for (UINT i = 0; i < FRAME_COUNT; ++i){
+		swapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[i]));
+		CD3DX12_CPU_DESCRIPTOR_HANDLE handle(rtvHeap->GetCPUDescriptorHandleForHeapStart(), i, rtvSize);
+		device->CreateRenderTargetView(backBuffers[i].Get(), nullptr, handle);
+	}
+}
