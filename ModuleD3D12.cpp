@@ -139,3 +139,11 @@ void ModuleD3D12::waitForGPU()
 	commandQueue->Signal(fence.Get(), ++fenceValue);
 	waitForFence(fenceValue);
 }
+
+//Method to prepare the command list for rendering.
+void ModuleD3D12::preRender()
+{
+	currentIndex = swapChain->GetCurrentBackBufferIndex();
+	waitForFence(fenceValues[currentIndex]);
+	allocators[currentIndex]->Reset();
+}
